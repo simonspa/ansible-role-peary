@@ -1,2 +1,14 @@
 ---
 # defaults file for ansible-role-peary
+
+peary_repository: "https://gitlab.cern.ch/Caribou/peary.git"
+peary_branch: master
+
+peary_build_folder: /tmp/peary
+peary_install_folder: /usr/local
+
+# Peary features:
+
+peary_interface_emulation: false
+peary_build_server: false
+peary_install_headers: true

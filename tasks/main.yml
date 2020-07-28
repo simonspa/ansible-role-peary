@@ -1,2 +1,48 @@
 ---
-# tasks file for ansible-role-peary
+# tasks file for Caribou Peary
+
+- name: Make sure Peary build dependencies are present
+  apt:
+    name: ['git', 'g++', 'cmake']
+
+- name: Install build dependencies for Peary interfaces
+  apt:
+    name: ['libi2c-dev']
+  when:
+    not peary_interface_emulation
+- name: Delete old build folder
+  file:
+    path: "{{ peary_build_folder }}"
+    state: absent
+
+- name: Clone Peary repository
+  git:
+    repo: "{{ peary_repository }}"
+    version: "{{ peary_branch }}"
+    accept_hostkey: yes
+    force: yes
+    dest: "{{ peary_build_folder }}"
+
+- name: Create build folder
+  file:
+    path: "{{ peary_build_folder }}/build"
+    state: directory
+
+- name: Configure Peary build
+  shell: "{{ item }}"
+  args:
+    chdir: "{{ peary_build_folder }}/build"
+  with_items:
+    - cmake -DINSTALL_PREFIX="{{ peary_install_folder }}" -DINTERFACE_EMULATION={{ 'ON' if peary_interface_emulation else 'OFF'}} -DINSTALL_HEADERS={{ 'ON' if peary_install_headers else 'OFF'}} -DBUILD_server={{ 'ON' if peary_build_server else 'OFF'}} {{ peary_cmake_options|default() }} ..
+
+- name: Build Peary
+  shell: "make -j{{ ansible_processor_vcpus|default(ansible_processor_count) }}"
+  args:
+    chdir: "{{ peary_build_folder }}/build"
+
+- name: Install Peary
+  make:
+    chdir: "{{ peary_build_folder }}/build"
+    target: install
+    params:
+      NUM_THREADS: "{{ ansible_processor_vcpus|default(ansible_processor_count) }}"
