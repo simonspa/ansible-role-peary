@@ -43,7 +43,7 @@ The following is an example playbook for installing Peary including the stand-al
 
 ## License
 
-BSD
+MIT
 
 ## Author Information
 
