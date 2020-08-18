@@ -1,38 +1,50 @@
-Role Name
-=========
+# Ansible Role for Caribou Peary
 
-A brief description of the role goes here.
+This role installs and deploys Peary through Ansible.
 
-Requirements
-------------
+## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+This role currently only supports Ubuntu/Debian systems.
 
-Role Variables
---------------
+## Role Variables
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+The following role variables can be used to configure this role. All variables are listed along with default values as defined in `defaults/main.yml`.
 
-Dependencies
-------------
+### Peary source and target
+`peary_repository: "https://gitlab.cern.ch/Caribou/peary.git"` - Git repository to fetch Peary code from. Replace with your own repository if you have additional code which is not contained in the main Peary repository.
+`peary_branch: master` - Peary version or Git branch to be deployed. The configured branch or tag has to exist in the selected repository.
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+`peary_build_folder: /tmp/peary`
+`peary_install_folder: /usr/local`
 
-Example Playbook
-----------------
+### Peary features
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+`peary_interface_emulation: false` - Select whether interfaces such as I2C or SPI should be emulated or not. Normally, interface emulation should be switched off on production systems and switched on if only decoding libraries are required, e.g. for deployment on a reconstruction machine.
+`peary_build_server: false` - Select whether to build the Peary server component or not.
+`peary_install_headers: true` - Select whether to install the framework headers or not. Installation is required in order to compile other software such as EUDAQ2 against Peary.
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+## Dependencies
 
-License
--------
+This role has no dependencies.
+
+## Example Playbook
+
+The following is an example playbook for installing Peary including the stand-alone Peary server:
+
+```yml
+  - hosts: runcontrols
+
+    vars:
+      peary_build_server: true
+
+    roles:
+      - role: ansible-role-peary
+```
+
+## License
 
 BSD
 
-Author Information
-------------------
+## Author Information
 
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+Simon Spannagel (<simon.spannagel@desy.de>) DESY
